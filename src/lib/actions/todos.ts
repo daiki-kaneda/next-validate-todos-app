@@ -4,8 +4,13 @@ import { CreateTodoSchema, Todo, TodoSchema } from '../schemas/Todo';
 import { revalidatePath } from 'next/cache';
 
 export type FormState = {
-    message?: string,
-    success: boolean
+    errors?: {
+        title?: {
+            errors: string[];
+        };
+    }
+    message?: string | null,
+    success?: boolean
 };
 export async function createTodoAction(
     prevState: FormState,
@@ -19,7 +24,7 @@ export async function createTodoAction(
     const result = CreateTodoSchema.safeParse(fields);
 
     if (!result.success) {
-        return { message: result.error.message, success: false }
+        return {errors:z.treeifyError(result.error).properties, message: "",success: false }
     }
 
     try {
